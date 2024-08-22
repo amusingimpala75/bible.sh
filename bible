@@ -30,7 +30,11 @@ else
     exit 1
   fi
 fi
-BIBLE="$HOME/.local/share/$TRANSLATION.txt"
+
+# Only set the default bible location if one is not provided by the user.
+if [ -z ${BIBLE+x} ]; then
+  BIBLE="$HOME/.local/share/$TRANSLATION.txt"
+fi
 
 # Download a copy from openbible.com
 # I plan to add support for scraping biblegateway.com, but that will take more work

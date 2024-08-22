@@ -20,7 +20,9 @@ Options are:
 
 If `TRANSLATION` is unset, the default is KJV. Regardless, no copy is downloaded/installed unless `bible download` is explicitly called.
 
+The `BIBLE` environment variable is used to set where the bible is downloaded to or read from. The default is `~/.local/share/$TRANSLATION.txt`.
+
 Subcommands are:
-- download: the Bible translation is downloaded from openbible.com, and saved to ~/.local/share/<translation>.txt
-- random: fetch a random verse
+- download: Download the bible translation `$TRANSLATION`, and save it to `$BIBLE`.
+- random: Fetch a random verse.
 - named: This one takes an argument in the form of "Book Chapter:Verse" (such as "John 3:16"), and prints the corresponding verse.
