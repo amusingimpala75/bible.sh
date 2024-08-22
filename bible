@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+
+# Translation from openbible.com, minus the Berean ones (the header is annoying on those files)
+TRANSLATIONS=(
+  "asv"
+  "akjv"
+  "cpdv"
+  "dbt"
+  "drb"
+  "erv"
+  "jps"
+  "kjv"
+  "slt"
+  "wbt"
+  "web"
+  "ylt"
+);
+
+#if [ ! -v TRANSLATION ]; then # macOS bash is 3.x
+if [ -z ${TRANSLATION+x} ]; then
+  # Default to the KJV
+  TRANSLATION="kjv"
+else
+  # Ensure it is a valid translation
+  PRESENT=$(printf '%s\0' "${TRANSLATIONS[@]}" | grep -F -x -z -- "$TRANSLATION" | tr -d '\000')
+  if [ -z "$PRESENT" ]; then
+    echo "Unsupported translation: $TRANSLATION"
+    TRLTS=$(printf '%s, ' "${TRANSLATIONS[@]}")
+    echo "Try one of: $TRLTS"
+    exit 1
+  fi
+fi
+BIBLE="$HOME/.local/share/$TRANSLATION.txt"
+
+# Download a copy from openbible.com
+# I plan to add support for scraping biblegateway.com, but that will take more work
+function download_bible() {
+  if [ -f "$BIBLE" ]; then
+    echo "KJV already downloaded"
+    exit 1
+  fi
+  curl "https://openbible.com/textfiles/$TRANSLATION.txt" | tail -n +3 > "$BIBLE"
+  exit 0
+}
+
+# Randomly select a verse from the bible (line-based)
+function random_verse() {
+  if [ ! -f "$BIBLE" ]; then
+    echo "KJV not yet downloaded"
+    exit 1
+  fi
+  LINE_COUNT=$(wc -l < "$BIBLE")
+  LINE=$((RANDOM % LINE_COUNT))
+  head -n "$LINE" < "$BIBLE" | tail -n 1
+  exit 0
+}
+
+# Not sure what issues this might have for non-alphanumerical/colon characters,
+# since it would be interpreted as a regex, but they shouldn't appear
+# in any references
+function named_verse() {
+  MATCH=$(echo -e "$1\t")
+  VERSE=$(grep "^$MATCH" < "$BIBLE")
+  if [ -z "$VERSE" ]; then
+    echo "Verse not found"
+    exit 1
+  else
+    echo "$VERSE"
+    exit 0
+  fi
+}
+
+if [ "$1" = "download" ]; then
+  download_bible
+elif [ "$1" = "random" ]; then
+  random_verse
+elif [ "$1" = "named" ]; then
+  if [ -z "$2" ]; then
+    echo "Missing argument for which verse"
+    exit 1
+  fi
+  named_verse "$2"
+elif [ -z "$1" ]; then
+  echo "Subcommands: download, random, named [reference]"
+  exit 1
+else
+  echo "Unknown command: $1"
+  exit 1
+fi
