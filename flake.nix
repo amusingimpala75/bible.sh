@@ -8,18 +8,25 @@
 
   outputs = inputs@{ flake-parts, ... }:
   flake-parts.lib.mkFlake { inherit inputs; } ({...}: {
+    imports = [ flake-parts.flakeModules.easyOverlay ];
+
     systems = [
       "aarch64-darwin"
-      # TODO more
+      "aarch64-linux"
+      "x86_64-darwin"
+      "x86_64-linux"
     ];
 
-    perSystem = { pkgs, ...}: rec {
+    perSystem = { config, pkgs, ...}: {
+      overlayAttrs = {
+        bible = config.packages;
+      };
       packages =
         let
           translations = builtins.attrNames (builtins.fromJSON (builtins.readFile ./translations.json));
         in
         (pkgs.lib.genAttrs translations (name: pkgs.callPackage ./package.nix { withTranslation = name; }))
-        // { default = packages.kjv; };
+        // { default = config.packages.kjv; };
     };
   });
 }
