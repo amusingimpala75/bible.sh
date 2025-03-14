@@ -7,15 +7,10 @@
   };
 
   outputs = inputs@{ flake-parts, ... }:
-  flake-parts.lib.mkFlake { inherit inputs; } ({...}: {
+  flake-parts.lib.mkFlake { inherit inputs; } ({ lib, ...}: {
     imports = [ flake-parts.flakeModules.easyOverlay ];
 
-    systems = [
-      "aarch64-darwin"
-      "aarch64-linux"
-      "x86_64-darwin"
-      "x86_64-linux"
-    ];
+    systems = lib.systems.flakeExposed;
 
     perSystem = { config, pkgs, ...}: {
       overlayAttrs = {
