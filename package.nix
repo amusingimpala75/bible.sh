@@ -11,8 +11,8 @@ in
 }:
 assert translationsHashes ? ${withTranslation};
 let
-  name = "bible";
-  script = (writeScriptBin name (builtins.readFile ./${name})).overrideAttrs(old: {
+  name = withTranslation;
+  script = (writeScriptBin name (builtins.readFile ./bible)).overrideAttrs(old: {
     buildCommand = "${old.buildCommand}\n patchShebangs $out";
   });
   path = "${withTranslation}.txt";
@@ -23,7 +23,7 @@ let
   };
 in
 symlinkJoin {
-  name = withTranslation;
+  inherit name;
   paths = [ script ];
   buildInputs = [ makeWrapper ];
   postBuild = "wrapProgram $out/bin/${name} --prefix PATH : $out/bin --set BIBLE ${file}";
