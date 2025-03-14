@@ -23,7 +23,7 @@ let
   };
 in
 symlinkJoin {
-  inherit name;
+  name = withTranslation;
   paths = [ script ];
   buildInputs = [ makeWrapper ];
   postBuild = "wrapProgram $out/bin/${name} --prefix PATH : $out/bin --set BIBLE ${file}";
