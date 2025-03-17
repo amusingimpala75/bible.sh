@@ -30,6 +30,7 @@ Subcommands are:
 - download: Download the bible translation `$TRANSLATION`, and save it to `$BIBLE`.
 - random: Fetch a random verse.
 - named: This one takes an argument in the form of "Book Chapter:Verse" (such as "John 3:16"), and prints the corresponding verse.
+- search: This also takes an argument, which is a Perl regexp to select text from the line
 
 ### Nix:
 The flake here declares packages for each of the above translations, so to try out one is `nix run github:amusingimpala75/bible.sh#asv` for the asv, for example.

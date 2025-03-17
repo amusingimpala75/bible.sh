@@ -79,6 +79,17 @@ function named_verse() {
   fi
 }
 
+function search() {
+  VERSES=$($GREP -P "$1" < "$BIBLE")
+  if [ -z "$VERSES" ]; then
+    echo "No strings matched"
+    exit 1
+  else
+    echo "$VERSES"
+    exit 0
+  fi
+}
+
 if [ "$1" = "download" ]; then
   download_bible
 elif [ "$1" = "random" ]; then
@@ -89,8 +100,14 @@ elif [ "$1" = "named" ]; then
     exit 1
   fi
   named_verse "$2"
+elif [ "$1" == "search" ]; then
+  if [ -z "$2" ]; then
+    echo "Missing argument for match string"
+    exit 1
+  fi
+  search "$2"
 elif [ -z "$1" ]; then
-  echo "Subcommands: download, random, named [reference]"
+  echo "Subcommands: download, random, named [reference], search [string]"
   exit 1
 else
   echo "Unknown command: $1"
