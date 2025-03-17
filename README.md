@@ -24,6 +24,8 @@ If `TRANSLATION` is unset, the default is KJV. Regardless, no copy is downloaded
 
 The `BIBLE` environment variable is used to set where the bible is downloaded to or read from. The default is `~/.local/share/$TRANSLATION.txt`.
 
+The `GREP` environment variable exists if you should desire to use a different grep source.
+
 Subcommands are:
 - download: Download the bible translation `$TRANSLATION`, and save it to `$BIBLE`.
 - random: Fetch a random verse.
@@ -33,3 +35,5 @@ Subcommands are:
 The flake here declares packages for each of the above translations, so to try out one is `nix run github:amusingimpala75/bible.sh#asv` for the asv, for example.
 
 To be used in another flake, apply the overlay provided at `overlays.default` and install the package `pkgs.bible.asv` if you would like the asv. The difference here is that the environment variables will NOT work as they are wrapped by nix, and as such the executable is the name of the translation to prevent collision in the case of multiples installations with differing translations.
+
+Packages can be overriden with the `grepPath` argument to configure the full path of the GNU grep-compatible grep function.

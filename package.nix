@@ -7,6 +7,8 @@ in
   symlinkJoin,
   withTranslation,
   writeScriptBin,
+
+  grepCommand ? "grep",
   ...
 }:
 assert translationsHashes ? ${withTranslation};
@@ -26,5 +28,5 @@ symlinkJoin {
   inherit name;
   paths = [ script ];
   buildInputs = [ makeWrapper ];
-  postBuild = "wrapProgram $out/bin/${name} --prefix PATH : $out/bin --set BIBLE ${file}";
+  postBuild = "wrapProgram $out/bin/${name} --prefix PATH : $out/bin --set BIBLE ${file} --set GREP ${grepCommand}";
 }
