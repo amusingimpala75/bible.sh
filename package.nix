@@ -2,13 +2,16 @@ let
   translationsHashes = builtins.fromJSON (builtins.readFile ./translations.json);
 in
 {
+  stdenv,
+
   fetchurl,
+  gnugrep,
   makeWrapper,
   symlinkJoin,
   withTranslation,
   writeScriptBin,
 
-  grepCommand ? "grep",
+  grepCommand ? if stdenv.isDarwin then "${gnugrep}/bin/grep" else "grep",
   ...
 }:
 assert translationsHashes ? ${withTranslation};
