@@ -2,34 +2,25 @@ let
   translationsHashes = builtins.fromJSON (builtins.readFile ./translations.json);
 in
 {
-  stdenv,
+  gnugrep,
 
   fetchurl,
-  gnugrep,
-  makeWrapper,
-  symlinkJoin,
-  withTranslation,
-  writeScriptBin,
+  writeShellApplication,
 
-  grepCommand ? if stdenv.isDarwin then "${gnugrep}/bin/grep" else "grep",
+  translation,
   ...
 }:
-assert translationsHashes ? ${withTranslation};
-let
-  name = withTranslation;
-  script = (writeScriptBin name (builtins.readFile ./bible)).overrideAttrs(old: {
-    buildCommand = "${old.buildCommand}\n patchShebangs $out";
-  });
-  path = "${withTranslation}.txt";
-  file = fetchurl {
-    url = "https://openbible.com/textfiles/${path}";
-    sha256 = translationsHashes.${withTranslation};
-    name = path;
+assert translationsHashes ? ${translation};
+writeShellApplication {
+  name = translation;
+  text = builtins.readFile ./bible.sh;
+  meta.description = "Bible query for the ${translation} translation";
+  runtimeInputs = [ gnugrep ];
+  runtimeEnv = {
+    BIBLE = fetchurl {
+      url = "https://openbible.com/textfiles/${translation}.txt";
+      sha256 = translationsHashes.${translation};
+      name = "${translation}.txt";
+    };
   };
-in
-symlinkJoin {
-  inherit name;
-  paths = [ script ];
-  buildInputs = [ makeWrapper ];
-  postBuild = "wrapProgram $out/bin/${name} --prefix PATH : $out/bin --set BIBLE ${file} --set GREP ${grepCommand}";
 }

@@ -20,7 +20,7 @@
         let
           translations = builtins.attrNames (builtins.fromJSON (builtins.readFile ./translations.json));
         in
-        (pkgs.lib.genAttrs translations (name: pkgs.callPackage ./package.nix { withTranslation = name; }))
+        (pkgs.lib.genAttrs translations (translation: pkgs.callPackage ./package.nix { inherit translation; }))
         // { default = config.packages.kjv; };
     };
   });

@@ -36,11 +36,6 @@ if [ -z ${BIBLE+x} ]; then
   BIBLE="$HOME/.local/share/$TRANSLATION.txt"
 fi
 
-# Default to grep
-if [ -z ${GREP+x} ]; then
-  GREP="grep"
-fi
-
 # Download a copy from openbible.com
 # I plan to add support for scraping biblegateway.com, but that will take more work
 function download_bible() {
@@ -69,7 +64,7 @@ function random_verse() {
 # in any references
 function named_verse() {
   MATCH="^$1\t\K.*" # match strings starting with reference, followed by \t and then capture rest of line
-  VERSE=$($GREP -oP "$MATCH" < "$BIBLE")
+  VERSE=$(grep -oP "$MATCH" < "$BIBLE")
   if [ -z "$VERSE" ]; then
     echo "Verse not found"
     exit 1
@@ -80,7 +75,7 @@ function named_verse() {
 }
 
 function search() {
-  VERSES=$($GREP -P "$1" < "$BIBLE")
+  VERSES=$(grep -P "$1" < "$BIBLE")
   if [ -z "$VERSES" ]; then
     echo "No strings matched"
     exit 1
